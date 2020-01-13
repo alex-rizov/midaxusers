@@ -1,0 +1,435 @@
+openapi: 3.0.0
+info:
+  description: API for interacting with user objects, domains and credentials verification.
+  version: 1.0.0
+  title: Midax Users
+  contact:
+    email: alex.r@midax.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+tags:
+  - name: user
+    description: Operations involving the active authenticated user
+  - name: users
+    description: Operations involving any user
+  - name: domain
+    description: Operations involving the domain of the active authenticated user
+  - name: domains
+    description: Operations involving any domain
+paths:
+  /user/password:
+    post:
+      tags:
+        - user
+      summary: Assign the current user a new password
+      description: ""
+      operationId: changeUserPassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasswordChange"
+        description: New password
+        required: true
+      responses:
+        "200":
+          description: Password Reset
+        "400":
+          description: Bad request
+  /user:
+    get:
+      tags:
+        - user
+      summary: Get the current user information
+      description: ""
+      operationId: getUser
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: Not Found
+  "/users/{userId}":
+    get:
+      tags:
+        - users
+      summary: Get  user information for a single user
+      description: ""
+      operationId: getUserById
+      parameters:
+        - name: userId
+          in: path
+          description: User UUID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: Not Found
+    put:
+      tags:
+        - users
+      summary: Update user information for a single user
+      description: ""
+      operationId: UpdateUserById
+      parameters:
+        - name: userId
+          in: path
+          description: User UUID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+        description: Updated user info
+        required: true
+      responses:
+        "200":
+          description: Success. Updated user object returned.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Cannot update user
+  /users:
+    get:
+      tags:
+        - users
+      summary: Get user information for a list of users
+      description: ""
+      operationId: getUserByIds
+      parameters:
+        - name: uuids
+          in: query
+          description: UUIDs of users to return
+          required: true
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        "200":
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        "404":
+          description: Not Found
+    post:
+      tags:
+        - users
+      summary: Create a new user
+      description: ""
+      operationId: createNewUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+        description: New user
+        required: true
+      responses:
+        "201":
+          description: Success. Created user object returned.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Bad request
+        "409":
+          description: Duplicate user
+  "/users/{userId}/logins":
+    post:
+      tags:
+        - users
+      summary: Update user logins for a single user
+      description: ""
+      operationId: UpdateUserLoginsById
+      parameters:
+        - name: userId
+          in: path
+          description: User UUID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/UserLogin"
+        description: Updated login info
+        required: true
+      responses:
+        "200":
+          description: Logins updated.
+        "400":
+          description: Cannot update user
+  "/users/{userId}/deactivate":
+    post:
+      tags:
+        - users
+      summary: Deactivate user logins for a single user
+      description: ""
+      operationId: DeactivateUserLoginsById
+      parameters:
+        - name: userId
+          in: path
+          description: User UUID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success.
+        "409":
+          description: Cannot deactivate user
+  /domain/users:
+    get:
+      tags:
+        - domain
+      summary: Get all active users in current user's domain and subdomains
+      description: ""
+      operationId: getCurrentDomainUsers
+      responses:
+        "200":
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        "404":
+          description: Not Found
+  /domain/users/inactive:
+    get:
+      tags:
+        - domain
+      summary: Get all inactive users in current user's domain and subdomains
+      description: ""
+      operationId: getCurrentDomainUsersInactive
+      responses:
+        "200":
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        "404":
+          description: Not Found
+  "/domains/{domainId}/users":
+    get:
+      tags:
+        - domains
+      summary: Get all active users in specified and subdomains
+      description: ""
+      operationId: getDomainUsers
+      parameters:
+        - name: domainId
+          in: path
+          description: Domain
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        "404":
+          description: Not Found
+  "/domain/{domainId}/users/inactive":
+    get:
+      tags:
+        - domains
+      summary: Get all inactive users in specified domain and subdomains
+      description: ""
+      operationId: getDomainUsersInactive
+      parameters:
+        - name: domainId
+          in: path
+          description: Domain
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        "404":
+          description: Not Found
+  "/domain/{domainId}/deactivate":
+    put:
+      tags:
+        - domains
+      summary: Deactivate all users in a domain
+      description: ""
+      operationId: deactivateDomain
+      parameters:
+        - name: domainId
+          in: path
+          description: Domain
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success. All deactivated users returned.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        "400":
+          description: Bad request
+  "/domain/{domainId}/migrate":
+    put:
+      tags:
+        - domains
+      summary: Migrate all users in a domain to another domain while preserving
+        subdomains
+      description: ""
+      operationId: migrateDomain
+      parameters:
+        - name: domainId
+          in: path
+          description: Domain
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewDomain"
+        description: New domain
+        required: true
+      responses:
+        "200":
+          description: Success. All users in new domain returned.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        "400":
+          description: Bad request
+servers:
+  - url: https://127.0.0.1/api/v1.0
+  - url: http://127.0.0.1/api/v1.0
+components:
+  securitySchemes:
+    petstore_auth:
+      type: http
+      scheme: basic
+    api_key:
+      type: apiKey
+      name: Bearer token.
+      in: header
+  schemas:
+    PasswordChange:
+      type: object
+      properties:
+        password:
+          type: string
+    NewDomain:
+      type: object
+      properties:
+        new-domain:
+          type: string
+    User:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        active:
+          type: boolean
+        domain:
+          type: string
+        role:
+          type: string
+        first_name:
+          type: string
+        middle_name:
+          type: string
+        last_name:
+          type: string
+        phone:
+          type: string
+        position:
+          type: string
+        user_manage_rights:
+          type: string
+          description: What domain level this user can view and edit.
+          enum:
+            - domain
+            - subdomain
+            - none
+        logins:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserLogin"
+        user_attributes:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserAttribute"
+    UserLogin:
+      type: object
+      properties:
+        login_type:
+          type: string
+          description: Type of login
+          enum:
+            - WEBSITE
+            - TERMINAL
+        login_key:
+          type: string
+        force_password_change:
+          type: boolean
+    UserAttribute:
+      type: object
+      description: Any key-value pair info a client wants to store with the user.
+      properties:
+        key:
+          type: string
+          example: value

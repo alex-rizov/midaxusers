@@ -1,0 +1,473 @@
+swagger: "2.0"
+info:
+  description: "API for interacting with user objects, domains and credentials verification."
+  version: "1.0.0"
+  title: "Midax Users"
+  contact:
+    email: "alex.r@midax.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "127.0.0.1"
+basePath: "/api/v1.0"
+tags:
+- name: "user"
+  description: "Operations involving the active authenticated user"
+- name: "users"
+  description: "Operations involving any user"
+- name: "domain"
+  description: "Operations involving the domain of the active authenticated user"
+- name: "domains"
+  description: "Operations involving any domain"
+schemes:
+- "https"
+- "http"
+paths:
+  /user/password:
+    post:
+      tags:
+      - "user"
+      summary: "Assign the current user a new password"
+      description: ""
+      operationId: "changeUserPassword"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "New password"
+        required: true
+        schema:
+          $ref: "#/definitions/PasswordChange"
+      responses:
+        200:
+          description: "Password Reset"
+        400:
+          description: "Bad request"
+        
+  /user:
+    get:
+      tags:
+      - "user"
+      summary: "Get the current user information"
+      description: ""
+      operationId: "getUser"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: '#/definitions/User'
+        404:
+          description: "Not Found"
+          
+  /users/{userId}:
+    get:
+      tags:
+      - "users"
+      summary: "Get  user information for a single user"
+      description: ""
+      operationId: "getUserById"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "userId"
+        in: "path"
+        description: "User UUID"
+        required: true
+        type: "string"
+        format: "uuid"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: '#/definitions/User'
+        404:
+          description: "Not Found"
+    put:
+      tags:
+      - "users"
+      summary: "Update user information for a single user"
+      description: ""
+      operationId: "UpdateUserById"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "userId"
+        in: "path"
+        description: "User UUID"
+        required: true
+        type: "string"
+        format: "uuid"
+      - in: "body"
+        name: "body"
+        description: "Updated user info"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        200:
+          description: "Success. Updated user object returned."
+          schema:
+            $ref: '#/definitions/User'
+        400:
+          description: "Cannot update user"
+          
+  /users:
+    get:
+      tags:
+      - "users"
+      summary: "Get user information for a list of users"
+      description: ""
+      operationId: "getUserByIds"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "uuids"
+        in: "query"
+        description: "UUIDs of users to return"
+        required: true
+        type: "array"
+        items:
+          type: "string"
+        collectionFormat: "csv"
+      responses:
+        200:
+          description: "Success."
+          schema:
+            type: "array"
+            items:
+              $ref: '#/definitions/User'
+        404:
+          description: "Not Found"
+    post:
+      tags:
+      - "users"
+      summary: "Create a new user"
+      description: ""
+      operationId: "createNewUser"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "New user"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        201:
+          description: "Success. Created user object returned."
+          schema:
+            $ref: '#/definitions/User'
+        400:
+          description: "Bad request"
+        409:
+          description: "Duplicate user"
+          
+  /users/{userId}/logins:
+    post:
+      tags:
+      - "users"
+      summary: "Update user logins for a single user"
+      description: ""
+      operationId: "UpdateUserLoginsById"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "userId"
+        in: "path"
+        description: "User UUID"
+        required: true
+        type: "string"
+        format: "uuid"
+      - in: "body"
+        name: "body"
+        description: "Updated login info"
+        required: true
+        schema:
+          type: "array"
+          items:
+            $ref: "#/definitions/UserLogin"
+      responses:
+        200:
+          description: "Logins updated."
+        400:
+          description: "Cannot update user"
+          
+  /users/{userId}/deactivate:
+    post:
+      tags:
+      - "users"
+      summary: "Deactivate user logins for a single user"
+      description: ""
+      operationId: "DeactivateUserLoginsById"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "userId"
+        in: "path"
+        description: "User UUID"
+        required: true
+        type: "string"
+        format: "uuid"
+      responses:
+        200:
+          description: "Success."
+        409:
+          description: "Cannot deactivate user"
+          
+          
+  /domain/users:
+    get:
+      tags:
+      - "domain"
+      summary: "Get all active users in current user's domain and subdomains"
+      description: ""
+      operationId: "getCurrentDomainUsers"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Success."
+          schema:
+            type: "array"
+            items:
+              $ref: '#/definitions/User'
+        404:
+          description: "Not Found"
+          
+  /domain/users/inactive:
+    get:
+      tags:
+      - "domain"
+      summary: "Get all inactive users in current user's domain and subdomains"
+      description: ""
+      operationId: "getCurrentDomainUsersInactive"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Success."
+          schema:
+            type: "array"
+            items:
+              $ref: '#/definitions/User'
+        404:
+          description: "Not Found"
+          
+  /domains/{domainId}/users:
+    get:
+      tags:
+      - "domains"
+      summary: "Get all active users in specified and subdomains"
+      description: ""
+      operationId: "getDomainUsers"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "domainId"
+        in: "path"
+        description: "Domain"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Success."
+          schema:
+            type: "array"
+            items:
+              $ref: '#/definitions/User'
+        404:
+          description: "Not Found"
+          
+  /domain/{domainId}/users/inactive:
+    get:
+      tags:
+      - "domains"
+      summary: "Get all inactive users in specified domain and subdomains"
+      description: ""
+      operationId: "getDomainUsersInactive"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "domainId"
+        in: "path"
+        description: "Domain"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Success."
+          schema:
+            type: "array"
+            items:
+              $ref: '#/definitions/User'
+        404:
+          description: "Not Found"
+          
+  /domain/{domainId}/deactivate:
+    put:
+      tags:
+      - "domains"
+      summary: "Deactivate all users in a domain"
+      description: ""
+      operationId: "deactivateDomain"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "domainId"
+        in: "path"
+        description: "Domain"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Success. All deactivated users returned."
+          schema:
+            type: "array"
+            items:
+              $ref: '#/definitions/User'
+        400:
+          description: "Bad request"
+          
+  /domain/{domainId}/migrate:
+    put:
+      tags:
+      - "domains"
+      summary: "Migrate all users in a domain to another domain while preserving subdomains"
+      description: ""
+      operationId: "migrateDomain"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "domainId"
+        in: "path"
+        description: "Domain"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "New domain"
+        required: true
+        schema:
+          $ref: "#/definitions/NewDomain"
+      responses:
+        200:
+          description: "Success. All users in new domain returned."
+          schema:
+            type: "array"
+            items:
+              $ref: '#/definitions/User'
+        400:
+          description: "Bad request"
+      
+  
+securityDefinitions:
+  petstore_auth:
+    type: "basic"
+  api_key:
+    type: "apiKey"
+    name: "Bearer token."
+    in: "header"
+definitions:
+  PasswordChange:
+    type: "object"
+    properties:
+      password:
+        type: "string"
+  NewDomain:
+    type: "object"
+    properties:
+      new-domain:
+        type: "string"
+  User:
+    type: "object"
+    properties:
+      uuid:
+        type: "string"
+        format: "uuid"
+      active:
+        type: "boolean"
+      domain:
+        type: "string"
+      role:
+        type: "string"
+      first_name:
+        type: "string"
+      middle_name:
+        type: "string"
+      last_name:
+        type: "string"
+      phone:
+        type: "string"
+      position:
+        type: "string"
+      user_manage_rights:
+        type: "string"
+        description: "What domain level this user can view and edit."
+        enum:
+        - "domain"
+        - "subdomain"
+        - "none"
+      logins:
+        type: "array"
+        items: 
+         $ref: "#/definitions/UserLogin"
+      user_attributes:
+        type: "array"
+        items:
+          $ref: "#/definitions/UserAttribute"
+        
+  UserLogin:
+    type: "object"
+    properties:
+      login_type:
+        type: "string"
+        description: "Type of login"
+        enum:
+        - "WEBSITE"
+        - "TERMINAL"
+      login_key:
+        type: "string"
+      force_password_change:
+        type: "boolean"
+        
+  UserAttribute:
+   type: "object"
+   description: "Any key-value pair info a client wants to store with the user."
+   properties:
+    key:
+      type: "string"
+      example: "value"
+  
+
