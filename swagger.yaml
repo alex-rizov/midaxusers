@@ -16,7 +16,7 @@ tags:
 - name: "users"
   description: "Operations involving any user"
 - name: "domain"
-  description: "Operations involving the domain of the active authenticated user"
+  description: "Operations involving the domain of the active authenticated user. Domain is a        string signifying multi-level user hierarchy and ownership. It is a list of arbitrary domain entities     separated by ^ sentinel. E.g top^midlle^low. All higher level domains have visibility       over lower levels."
 - name: "domains"
   description: "Operations involving any domain"
 schemes:
@@ -113,7 +113,7 @@ paths:
         description: "Updated user info"
         required: true
         schema:
-          $ref: "#/definitions/User"
+          $ref: "#/definitions/NewUser"
       responses:
         200:
           description: "Success. Updated user object returned."
@@ -167,7 +167,7 @@ paths:
         description: "New user"
         required: true
         schema:
-          $ref: "#/definitions/User"
+          $ref: "#/definitions/NewUser"
       responses:
         201:
           description: "Success. Created user object returned."
@@ -304,7 +304,7 @@ paths:
         404:
           description: "Not Found"
           
-  /domain/{domainId}/users/inactive:
+  /domains/{domainId}/users/inactive:
     get:
       tags:
       - "domains"
@@ -331,7 +331,7 @@ paths:
         404:
           description: "Not Found"
           
-  /domain/{domainId}/deactivate:
+  /domains/{domainId}/deactivate:
     put:
       tags:
       - "domains"
@@ -358,11 +358,11 @@ paths:
         400:
           description: "Bad request"
           
-  /domain/{domainId}/migrate:
+  /domains/{domainId}/migrate:
     put:
       tags:
       - "domains"
-      summary: "Migrate all users in a domain to another domain while preserving subdomains"
+      summary: "Migrate all users in a domain and all subdomains to another domain while preserving subdomain hierarchy"
       description: ""
       operationId: "migrateDomain"
       consumes:
@@ -420,6 +420,47 @@ definitions:
         type: "boolean"
       domain:
         type: "string"
+        description: "Domain is a string signifying multi-level user hierarchy. It is
+        a list of arbitrary domain entities separated by ^ sentinel. E.g top^midlle^low. 
+        All higher level domains have visibility over lower levels."
+      role:
+        type: "string"
+      first_name:
+        type: "string"
+      middle_name:
+        type: "string"
+      last_name:
+        type: "string"
+      phone:
+        type: "string"
+      position:
+        type: "string"
+      user_manage_rights:
+        type: "string"
+        description: "What domain level this user can view and edit."
+        enum:
+        - "domain"
+        - "subdomain"
+        - "none"
+      logins:
+        type: "array"
+        items: 
+         $ref: "#/definitions/UserLogin"
+      user_attributes:
+        type: "array"
+        items:
+          $ref: "#/definitions/UserAttribute"
+  
+  NewUser:
+    type: "object"
+    properties:
+      active:
+        type: "boolean"
+      domain:
+        type: "string"
+        description: "Domain is a string signifying multi-level user hierarchy. It is
+        a list of arbitrary domain entities separated by ^ sentinel. E.g top^midlle^low. 
+        All higher level domains have visibility over lower levels."
       role:
         type: "string"
       first_name:
@@ -469,5 +510,3 @@ definitions:
     key:
       type: "string"
       example: "value"
-  
-
