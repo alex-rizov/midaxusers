@@ -16,7 +16,7 @@ tags:
 - name: "users"
   description: "Operations involving any user"
 - name: "domain"
-  description: "Operations involving the domain of the active authenticated user. Domain is a        string signifying multi-level user hierarchy and ownership. It is a list of arbitrary domain entities     separated by ^ sentinel. E.g top^midlle^low. All higher level domains have visibility       over lower levels."
+  description: "Operations involving the domain of the active authenticated user. Domain is a        case-insensitive string signifying multi-level user hierarchy and ownership. It is a list of arbitrary domain entities     separated by ^ sentinel. E.g top^midlle^low. All higher level domains have visibility       over lower levels."
 - name: "domains"
   description: "Operations involving any domain"
 schemes:
@@ -420,9 +420,7 @@ definitions:
         type: "boolean"
       domain:
         type: "string"
-        description: "Domain is a string signifying multi-level user hierarchy. It is
-        a list of arbitrary domain entities separated by ^ sentinel. E.g top^midlle^low. 
-        All higher level domains have visibility over lower levels."
+        description: "Domain is a case-insensitive string signifying multi-level user hierarchy. It is a list of arbitrary domain entities separated by ^ sentinel. E.g top^midlle^low. All higher level domains have visibility over lower levels."
       role:
         type: "string"
       first_name:
@@ -458,9 +456,7 @@ definitions:
         type: "boolean"
       domain:
         type: "string"
-        description: "Domain is a string signifying multi-level user hierarchy. It is
-        a list of arbitrary domain entities separated by ^ sentinel. E.g top^midlle^low. 
-        All higher level domains have visibility over lower levels."
+        description: "Domain is a case-insensitive string signifying multi-level user hierarchy. It is a list of arbitrary domain entities separated by ^ sentinel. E.g top^midlle^low. All higher level domains have visibility over lower levels."
       role:
         type: "string"
       first_name:
