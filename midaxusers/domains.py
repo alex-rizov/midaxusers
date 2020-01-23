@@ -3,6 +3,7 @@ from flask import abort
 from sqlalchemy import or_
 
 def domain_cleanup(domain):
+    domain = domain.casefold()
     domainlevels = domain.split(domain_separator)
     current_domain_depth = ''    
         
