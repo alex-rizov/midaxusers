@@ -26,7 +26,7 @@ mccabe==0.6.1
 more-itertools==4.3.0
 pkginfo==1.4.2
 pluggy==0.7.1
-py==1.6.0
+py==1.10.0
 Pygments==2.7.4
 pylint==2.1.1
 pyodbc==4.0.24
